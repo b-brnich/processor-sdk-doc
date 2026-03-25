@@ -1,4 +1,5 @@
 ---
+# yamllint disable rule:line-length
 # Each component identified by its path prefix has a list of owners
 components:
 
@@ -68,14 +69,14 @@ components:
     - jeevantelukula
     - praneethbajjuri
     - uditkumarti
-    - gehariprasath  
+    - gehariprasath
 
   source/linux/Foundational_Components:
     - devarsht
     - praneethbajjuri
     - r-vignesh
     - uditkumarti
-    - gehariprasath  
+    - gehariprasath
 
   source/linux/Foundational_Components/IPC:
     - 3V3RYONE
@@ -92,11 +93,12 @@ components:
     - praneethbajjuri
     - r-vignesh
     - uditkumarti
-    - gehariprasath  
+    - gehariprasath
 
   source/linux/Foundational_Components/Power_Management:
     - DhruvaG2000
     - vishalmti
+    - kwillis01
 
   source/linux/Foundational_Components/Graphics:
     - Antonios-C

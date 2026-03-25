@@ -1,5 +1,5 @@
 =======================================
- RT-linux 11.00.00.00 Performance Guide
+ RT-linux 11.02.08.02 Performance Guide
 =======================================
 
 .. rubric::  **Read This First**
@@ -73,11 +73,12 @@ default SDK image:
    node in the Linux kernel device tree. This way the HW TRNG is accessed from
    the kernel itself.
 
+
 .. csv-table::
    :header: "Latencies","CPU 0","CPU 1"
 
-   "Minimum (us)","5","5"
-   "Average (us)","8","7"
-   "Maximum (us)","57","48"
+   "Minimum (usec)","5","5"
+   "Average (usec)","8","7"
+   "Maximum (usec)","62","47"
 
 .. image:: img/rt-cpu-method-all-latency-histogram.png

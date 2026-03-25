@@ -15,12 +15,6 @@ Build
       the top-level directory and can be identified by looking for the
       "licenses" directory.
 
-   .. rubric:: Setting up the toolchain paths
-
-   .. include:: ../../Overview/GCC_ToolChain.rst
-      :start-after: .. start_include_yocto_toolchain_host_setup
-      :end-before: .. end_include_yocto_toolchain_host_setup
-
    .. code-block:: console
 
       $ cd <path to tf-a dir>
@@ -80,15 +74,7 @@ Several prebuilt images are required from the TI Processor SDK for building U-Bo
    - ti-linux-firmware (BINMAN_INDIRS): Prebuilt binaries for DM and SYSFW available `here
      <https://git.ti.com/cgit/processor-firmware/ti-linux-firmware/log/?h=ti-linux-firmware>`__.
 
-All of these are available in the SDK at :file:`<path to tisdk>/board-support/prebuilt-images>`
-
-Go :ref:`here <download-and-install-sdk>` to download and install the SDK.
-
-.. rubric:: Setting up the toolchain paths
-
-.. include:: ../../Overview/GCC_ToolChain.rst
-   :start-after: .. start_include_yocto_toolchain_host_setup
-   :end-before: .. end_include_yocto_toolchain_host_setup
+All of these binaries are available in the SDK at :file:`<path to tisdk>/board-support/prebuilt-images>`
 
 .. ifconfig:: CONFIG_part_variant not in ('AM62LX')
 
@@ -447,6 +433,7 @@ Go :ref:`here <download-and-install-sdk>` to download and install the SDK.
       $ export UBOOT_DIR=<path-to-ti-u-boot>
       $ export TI_LINUX_FW_DIR=<path-to-ti-linux-firmware>
       $ export TFA_DIR=<path-to-arm-trusted-firmware>
+      $ export OPTEE_DIR=<path-to-ti-optee-os>
 
    .. note::
 
@@ -465,7 +452,8 @@ Go :ref:`here <download-and-install-sdk>` to download and install the SDK.
       $ make CROSS_COMPILE="$CROSS_COMPILE_64" \
          BL1=$TFA_DIR/build/k3/am62l/release/bl1.bin \
          BL31=$TFA_DIR/build/k3/am62l/release/bl31.bin \
-         BINMAN_INDIRS=$TI_LINUX_FW_DIR
+         BINMAN_INDIRS=$TI_LINUX_FW_DIR \
+         TEE=$OPTEE_DIR/out/arm-plat-k3/core/tee-pager_v2.bin
 
 .. ifconfig:: CONFIG_part_variant not in ('AM64X', 'AM62X', 'AM62AX', 'AM62LX')
 

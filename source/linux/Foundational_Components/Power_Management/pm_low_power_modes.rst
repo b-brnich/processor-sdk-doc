@@ -8,12 +8,6 @@ Low Power Modes
 Overview
 ********
 
-.. ifconfig:: CONFIG_part_variant in ('AM62X')
-
-   .. important::
-
-      SK-AM62-SIP EVM does NOT support low power modes.
-
 The following sections describe a high-level description of the different low power modes (LPM) of the
 device. If your application requires inactive power management, you must determine which
 low power mode described below satisfies your requirements. Each mode must be evaluated
@@ -60,7 +54,7 @@ sources is found to be enabled, Partial I/O is entered instead of poweroff.
 
 The following wakeup sources have been configured for Partial I/O:
 mcu_uart0, mcu_mcan0, and mcu_mcan1. Partial I/O mode can only be tested
-when `k3-am62x-sk-lpm-wkup-sources.dtso <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/arch/arm64/boot/dts/ti/k3-am62x-sk-lpm-wkup-sources.dtso?h=11.01.05>`__
+when `k3-am62x-sk-lpm-wkup-sources.dtso <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/arch/arm64/boot/dts/ti/k3-am62x-sk-lpm-wkup-sources.dtso?h=11.02.08>`__
 overlay is loaded. Please refer to :ref:`How to enable DT overlays<howto_dt_overlays>` for more details.
 
 After Linux boots, the MCAN wakeup for Partial I/O is enabled.
@@ -122,7 +116,7 @@ I/O Only Plus DDR
    The wakeup sources that can be used to wake the system from I/O Only Plus
    DDR are mcu_uart0, mcu_mcan0, mcu_mcan1 and wkup_uart0. To use the mcu_mcan0
    and mcu_mcan1 wakeup sources, apply the
-   `k3-am62x-sk-lpm-io-ddr-wkup-sources.dtso <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/arch/arm64/boot/dts/ti/k3-am62x-sk-lpm-io-ddr-wkup-sources.dtso?h=11.01.05>`__
+   `k3-am62x-sk-lpm-io-ddr-wkup-sources.dtso <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/arch/arm64/boot/dts/ti/k3-am62x-sk-lpm-io-ddr-wkup-sources.dtso?h=11.02.08>`__
    overlay. Please refer to :ref:`How to enable DT overlays<howto_dt_overlays>`
    for more details. To use the mcu_uart0 and wkup_uart0 wakeup sources, direct
    register writes can be used to enable wakeup after Linux boots.
@@ -386,6 +380,34 @@ MCU Only mode using one of the supported wakeup sources.
 ***********
 Limitations
 ***********
+
+.. ifconfig:: CONFIG_part_variant in ('AM62X')
+
+   .. important::
+
+      SK-AM62-SIP EVM does NOT support low power modes.
+
+   .. important::
+
+      When using low power modes on SK-AM62-LP EVM, USB1 **cannot** be connected
+      to anything. When USB1 is connected and a low power mode is entered, the
+      EVM fails to resume to an active Linux state.
+
+      **Hardware Workaround:** Remove resistor R131 from the SK-AM62-LP EVM to resolve
+      this limitation and enable proper resume from low power modes.
+
+.. ifconfig:: CONFIG_part_variant in ('AM62PX')
+
+   .. important::
+
+      When using low power modes on SK-AM62P-LP E1 or E1-1 EVMs, USB1 **cannot** be connected
+      to anything. When USB1 is connected and a low power mode is entered, the
+      EVM fails to resume to an active Linux state.
+
+      **Hardware Workaround:** Remove resistor R169 from the SK-AM62P-LP EVM to resolve
+      this limitation and enable proper resume from low power modes.
+
+RT (Real-Time) Linux does not support any low power modes.
 
 HWRNG support on GP devices is incompatible with Deep Sleep and MCU Only
 modes. To test LPM on GP devices, HWRNG has to be unloaded one-time

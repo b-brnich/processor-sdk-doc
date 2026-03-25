@@ -56,6 +56,7 @@ linux/Foundational_Components_Kernel_Drivers
 linux/Foundational_Components/Kernel/Kernel_Drivers/Audio
 linux/Foundational_Components/Kernel/Kernel_Drivers/Camera/CSI2RX
 linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto/SA2UL_OMAP
+linux/Foundational_Components/Kernel/Kernel_Drivers/DDR
 linux/Foundational_Components/Kernel/Kernel_Drivers/Display/DSS7
 linux/Foundational_Components/Kernel/Kernel_Drivers/DM-Timer
 linux/Foundational_Components/Kernel/Kernel_Drivers/EQEP
@@ -101,6 +102,7 @@ linux/Foundational_Components/Power_Management/pm_debug
 linux/Foundational_Components/System_Security/Security_overview
 linux/Foundational_Components/System_Security/SELinux
 linux/Foundational_Components/System_Security/Auth_boot
+linux/Foundational_Components/System_Security/Memory_Firewalls
 
 linux/Foundational_Components_Kernel_Users_Guide
 linux/Foundational_Components_Kernel_LTP-DDT_Validation
@@ -161,6 +163,7 @@ linux/How_to_Guides/Target/How_to_test_MCAN_on_AM62x
 linux/How_to_Guides/Target/How_to_enable_DT_overlays_in_linux
 linux/How_to_Guides/Target/How_to_playback_audio_over_HDMI
 linux/How_to_Guides/Target/How_to_enable_display_sharing_between_remotecore_and_Linux
+linux/How_to_Guides/Target/How_to_enable_SSC_for_DSS
 linux/How_to_Guides/Target/How_to_boot_quickly
 linux/How_to_Guides/Target/How_to_enable_Microtips_LVDS_Panel
 linux/How_to_Guides/Target/How_To_Enable_M2CC3301_in_linux
@@ -178,5 +181,6 @@ linux/Demo_User_Guides/TI_Apps_Launcher_User_Guide
 linux/Demo_User_Guides/Seva_Store
 linux/Demo_User_Guides/Display_Cluster_User_Guide
 linux/Demo_User_Guides/Chromium_Browser
+linux/Demo_User_Guides/GUI_Frameworks_User_Guide
 
 linux/Documentation_Tarball

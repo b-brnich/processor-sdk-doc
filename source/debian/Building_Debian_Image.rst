@@ -30,6 +30,17 @@ Therefore, the first step is to fetch TI's fork:
 
    git clone https://github.com/TexasInstruments/armbian-build.git
 
+.. ifconfig:: CONFIG_part_variant in ('AM62LX')
+
+   .. note::
+
+      BeagleBadge is supported in Armbian but is not yet supported on **ti-main** branch, therefore run the following command
+      before building for BeagleBadge:
+
+      .. code-block:: console
+
+         git checkout 2025.12-beaglebadge
+
 Repository Structure
 --------------------
 
@@ -72,12 +83,14 @@ Armbian supports both an interactive UI and a noninteractive build process.
 .. note::
 
    This build guide has been tested on an x86 host machine running Ubuntu 22.04. The Armbian :file:`compile.sh` script
-   builds in an ARM64 docker container. Ensure the following packages are installed:
+   builds in an ARM64 docker container. Install the following packages and configure docker:
 
    .. code-block:: console
 
       sudo apt update
-      sudo apt install docker.io qemu qemu-user-static binfmt-support
+      sudo apt install docker.io qemu-user-static binfmt-support
+      sudo usermod -aG docker $USER
+      newgrp docker
 
 -  To build interactively:
 
@@ -119,8 +132,8 @@ For a list of boards and branches supported by each SoC, refer:
       AM62-LP,sk-am62-lp,``config/boards/sk-am62-lp.conf``,"vendor, vendor-rt, vendor-edge, edge"
       AM62SIP,sk-am62-sip,``config/boards/sk-am62-sip.conf``,"vendor, vendor-rt, vendor-edge, edge"
       AM62Lx,tmds62levm,``config/boards/tmds62levm.conf``,"vendor, vendor-rt, vendor-edge"
+      AM62Lx,beaglebadge,``config/boards/beaglebadge.conf``,"vendor-edge"
       AM62Px,sk-am62p,``config/boards/sk-am62p.conf``,"vendor, vendor-rt, vendor-edge, edge"
       AM64x,sk-am64b,``config/boards/sk-am64b.conf``,"vendor, vendor-rt, vendor-edge, edge"
-
 
 ``output/images/`` stores the built images. These images have a ``.img`` extension.

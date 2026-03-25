@@ -1,5 +1,19 @@
 # Contributing to processor-sdk-doc
 
+## Release branching
+
+This project has adopted release branches for major release numbers. This allows
+for updates and fixes on documentation for past release windows.
+
+The `master` branch is for the current major release. An active window ends with
+first release candidate of the next major release. At this time a new branch
+spawns from `master` to track any further contributions. Open pull requests
+that change content related to the old release are `Closed`. If they are still
+valid you can reopen them against the new branch.
+
+This means branch `12` will not exist until the first `13` tag is present on
+`meta-ti` or `meta-arago`. Until that point `master` is effectively `12`.
+
 ## Commit formatting
 
 The main requirements are that commits contain a reasonable commit message and
@@ -162,6 +176,35 @@ in this case:
 
 ```
 replace_b
+```
+
+### Headings / sections
+
+We are trying to move to the [Python Developer's Guide for
+documenting](https://devguide.python.org/documentation/markup/#sections)
+standard of section hierarchy. This means that section definitions should use
+the following pattern:
+
+```rst
+#########
+Section 1
+#########
+
+*********
+Section 2
+*********
+
+Section 3
+=========
+
+Section 4
+---------
+
+Section 5
+^^^^^^^^^
+
+Section 6
+"""""""""
 ```
 
 ## Licensing

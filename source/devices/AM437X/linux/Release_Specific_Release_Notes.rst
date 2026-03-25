@@ -54,10 +54,13 @@ Released November 2025
 
 Processor SDK 11.02 Release has following new features:
 
- - 2025 LTS Stable Update to 6.12.57
+ - 2025 LTS Stable Update to 6.12.49
  - ICSSM bug fixes
  - Test automation improvements
  - HDMI suport in Linux
+ - ARM Analytics AI stack enabled in the filesystem
+ - LVGL (Light and Versatile Graphics Library) based interactive demo as out-of-the-box (OOB) on display
+ - Added support for McASP async mode: independent transmit (playback) and receive (capture) clocking
 
 .. rubric:: SDK Components & Versions
    :name: sdk-components-versions
@@ -65,7 +68,7 @@ Processor SDK 11.02 Release has following new features:
 +--------------------------+----------------------------+
 | Component                | Version                    |
 +==========================+============================+
-| Linux Kernel             | 6.12.57 (2025 LTS)         |
+| Linux Kernel             | 6.12.49 (2025 LTS)         |
 +--------------------------+----------------------------+
 | U-Boot                   | 2025.01                    |
 +--------------------------+----------------------------+
@@ -101,8 +104,8 @@ Build Information
      - :ref:`Build Config <Build-U-Boot-label>`
    * - Linux Kernel
      - `ti-linux-6.12.y <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/log/?h=ti-linux-6.12.y>`__
-     - non-RT- `11.02.05 <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tag/?h=11.02.05>`__ , RT- `11.02.05-rt <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tag/?h=11.02.05-rt>`__
-     - `non-RT <https://git.yoctoproject.org/meta-ti/tree/meta-ti-bsp/recipes-kernel/linux/linux-ti-staging-6.12/ti43x/defconfig?h=11.02.05>`__ , `RT <https://git.yoctoproject.org/meta-ti/tree/meta-ti-bsp/recipes-kernel/linux/linux-ti-staging-rt-6.12/ti43x/defconfig?h=11.02.05>`__
+     - `11.02.05 <https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tag/?h=11.02.05>`__
+     - `non-RT <https://git.yoctoproject.org/meta-ti/tree/meta-ti-bsp/recipes-kernel/linux/linux-ti-staging-6.12/ti43x/defconfig?h=11.02.05>`__
    * - meta-ti
      - `scarthgap <https://git.yoctoproject.org/meta-ti/log/?h=scarthgap>`__
      - `11.02.05 <https://git.yoctoproject.org/meta-ti/tag/?h=11.02.05>`__
@@ -125,16 +128,16 @@ Issues Tracker
 
     - Further Information can be found at `SIR Portal <https://sir.ext.ti.com/>`_
 
-Issues Open
------------
+Issues Resolved
+---------------
 .. csv-table::
    :header: "Record ID", "Title"
    :widths: 15, 70
 
-   "EXTSYNC-5849","PRU RPMsg swaps which message is sent to which core"
-   "EXTSYNC-5814","Does Remoteproc driver for PRU-ICSS still zero out memory?"
-   "EXTSYNC-6120","AM437x Disable DeepSleep0 UART Wakeup"
-
+   "`EXT_SITMPUSW-146 <https://sir.ext.ti.com/jira/browse/EXT_SITMPUSW-146>`_","Yocto: meta-ti*: kernel source has uncommited changes"
+   "`EXT_SITMPUSW-145 <https://sir.ext.ti.com/jira/browse/EXT_SITMPUSW-145>`_","Linux SDK User Manual needs Customer-Accessible Change Log / Revision History"
+   "`EXT_EP-12830 <https://sir.ext.ti.com/jira/browse/EXT_EP-12830>`_","Dhrystone performance report contains wrong cpu frequency"
+   "`EXT_EP-12067 <https://sir.ext.ti.com/jira/browse/EXT_EP-12067>`_","AM335x/AM437x PRU Ethernet slowdown from kernel 4.19 -> 5.4/5.10"
 
 .. rubric:: Installation and Usage
    :name: installation-and-usage

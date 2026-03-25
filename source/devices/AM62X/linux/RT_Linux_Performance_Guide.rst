@@ -1,6 +1,6 @@
-=================================
- RT-linux 11.01 Performance Guide
-=================================
+=======================================
+ RT-linux 11.02.08.02 Performance Guide
+=======================================
 
 .. rubric::  **Read This First**
    :name: read-this-first-kernel-perf-guide
@@ -85,6 +85,6 @@ default SDK image using the SK-AM62B-P1_ reference board:
 
    "Minimum (usec)","5","5","5","5"
    "Average (usec)","6","6","6","6"
-   "Maximum (usec)","62","46","47","52"
+   "Maximum (usec)","66","41","39","31"
 
 .. image:: img/rt-cpu-method-all-latency-histogram.png

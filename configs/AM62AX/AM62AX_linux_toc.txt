@@ -55,6 +55,7 @@ linux/Foundational_Components_Kernel_Drivers
 linux/Foundational_Components/Kernel/Kernel_Drivers/Audio
 linux/Foundational_Components/Kernel/Kernel_Drivers/Camera/CSI2RX
 linux/Foundational_Components/Kernel/Kernel_Drivers/Crypto/SA2UL_OMAP
+linux/Foundational_Components/Kernel/Kernel_Drivers/DDR
 linux/Foundational_Components/Kernel/Kernel_Drivers/Display/DSS7
 linux/Foundational_Components/Kernel/Kernel_Drivers/DM-Timer
 linux/Foundational_Components/Kernel/Kernel_Drivers/EQEP
@@ -96,6 +97,7 @@ linux/Foundational_Components/Power_Management/pm_debug
 linux/Foundational_Components/System_Security/Security_overview
 linux/Foundational_Components/System_Security/SELinux
 linux/Foundational_Components/System_Security/Auth_boot
+linux/Foundational_Components/System_Security/Memory_Firewalls
 
 linux/Foundational_Components_Kernel_Users_Guide
 linux/Foundational_Components_Kernel_LTP-DDT_Validation
@@ -124,6 +126,7 @@ linux/How_to_Guides/Target/How_to_test_MCAN_on_AM62x
 linux/How_to_Guides/Target/How_to_enable_DT_overlays_in_linux
 linux/How_to_Guides/Target/How_To_Enable_M2CC3301_in_linux
 linux/How_to_Guides/Target/How_to_playback_audio_over_HDMI
+linux/How_to_Guides/Target/How_to_enable_SSC_for_DSS
 linux/How_to_Guides/Target/How_to_Use_K3Conf_Tool
 linux/How_to_Guides/Target/Runtime_debug_unlock_on_secure_device
 linux/How_to_Guides/Target/How_to_Tune_Real_Time_Linux

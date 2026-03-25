@@ -54,17 +54,18 @@ Released November 2025
 
 **Processor SDK Linux AM65X Release has following new features:**
 
- - 2025 LTS Stable Update to 6.12.57
+ - 2025 LTS Stable Update to 6.12.49
  - ICSSM bug fixes
  - VLAN Multicast filtering on ICSSG
  - ICSSG XDP Support (Zero Copy)
- - Test automation improvements
-
+ - ARM Analytics AI stack enabled in the filesystem
+ - LVGL (Light and Versatile Graphics Library) based interactive demo as out-of-the-box (OOB) on display
+ - Added support for McASP async mode: independent transmit (playback) and receive (capture) clocking
 
 **Component version:**
 
-  - Kernel 6.12.57
-  - RT Kernel 6.12.57
+  - Kernel 6.12.49
+  - RT Kernel 6.12.49
   - U-Boot 2025.01
   - Toolchain GCC 13.4+
   - ATF 2.13+
@@ -124,6 +125,51 @@ Build Information
      - `11.02.05.02 <https://git.ti.com/cgit/ti-sdk-linux/meta-tisdk/tag/?h=11.02.05.02>`__
      -
 
+Issues Tracker
+==============
+
+.. note::
+
+    - Release Specific Issues including details will be published through Software Incident Report (SIR) portal
+
+    - Further Information can be found at `SIR Portal <https://sir.ext.ti.com/>`_
+
+Errata Resolved
+---------------
+.. csv-table::
+   :header: "Record ID", "Title"
+   :widths: 15, 70
+
+   "`EXT_EP-12052 <https://sir.ext.ti.com/jira/browse/EXT_EP-12052>`_","PRU_ICSSG: DOC: Undefined labels"
+   "`EXT_EP-12118 <https://sir.ext.ti.com/jira/browse/EXT_EP-12118>`_","PCI-Express: GEN3 (8GT/s) Operation Not Supported"
+   "`EXT_EP-12121 <https://sir.ext.ti.com/jira/browse/EXT_EP-12121>`_","USB: USB2PHY Charger Detect is enabled by default without VBUS presence"
+   "`EXT_EP-12120 <https://sir.ext.ti.com/jira/browse/EXT_EP-12120>`_","DSS : DSS Does Not Support YUV Pixel Data Formats"
+   "`EXT_EP-12119 <https://sir.ext.ti.com/jira/browse/EXT_EP-12119>`_","USB: SuperSpeed USB Non-Functional"
+
+Issues Resolved
+---------------
+.. csv-table::
+   :header: "Record ID", "Title"
+   :widths: 15, 70
+
+   "`EXT_SITMPUSW-146 <https://sir.ext.ti.com/jira/browse/EXT_SITMPUSW-146>`_","Yocto: meta-ti*: kernel source has uncommited changes"
+   "`EXT_SITMPUSW-145 <https://sir.ext.ti.com/jira/browse/EXT_SITMPUSW-145>`_","Linux SDK User Manual needs Customer-Accessible Change Log / Revision History"
+   "`EXT_EP-13129 <https://sir.ext.ti.com/jira/browse/EXT_EP-13129>`_","cpsw: probe failed if CONFIG_DEBUG_FS is disabled"
+   "`EXT_EP-12226 <https://sir.ext.ti.com/jira/browse/EXT_EP-12226>`_","Backport ""board: ti: common: Kconfig: add CMD_CACHE"" into TI U-Boot Tree"
+   "`EXT_EP-13147 <https://sir.ext.ti.com/jira/browse/EXT_EP-13147>`_","padconfig: ST_EN bit not preserved"
+   "`EXT_EP-12344 <https://sir.ext.ti.com/jira/browse/EXT_EP-12344>`_","SDK DOC: Both MII ports still have to be enabled in single port case"
+   "`EXT_EP-12111 <https://sir.ext.ti.com/jira/browse/EXT_EP-12111>`_","Linux SDK v10.0: TI-added support for W25N01JW SPI NAND breaks other existing Flash support"
+   "`EXT_EP-12048 <https://sir.ext.ti.com/jira/browse/EXT_EP-12048>`_","am654x-idk DFU boot is failing"
+   "`EXT_EP-12828 <https://sir.ext.ti.com/jira/browse/EXT_EP-12828>`_","Fix order of MCU R5 shutdown depending on cluster mode"
+
+Issues Open
+-----------
+.. csv-table::
+   :header: "Record ID", "Title"
+   :widths: 15, 70
+
+   "`EXT_EP-12818 <https://sir.ext.ti.com/jira/browse/EXT_EP-12818>`_","PRU RPMsg swaps which message is sent to which core"
+   "`EXT_EP-12080 <https://sir.ext.ti.com/jira/browse/EXT_EP-12080>`_","AM654x: USB MSC boot mode fails"
 
 Installation and Usage
 ======================

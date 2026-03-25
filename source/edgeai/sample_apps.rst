@@ -1,8 +1,8 @@
 .. _pub_edgeai_sample_apps:
 
-===================
+*******************
 Edge AI sample apps
-===================
+*******************
 
 There are various ways you can explore running a typical Edge AI usecase on
 |__PART_FAMILY_NAME__| EVM,
@@ -18,8 +18,9 @@ The SDK is packaged with networks which does 3 DL tasks as below,
     - **Object Detection**: Detects and draws bounding boxes around the objects, also classifies the objects to one of the classes in dataset
     - **Semantic Segmentation**: Classifies each pixel into class in dataset
 
+******************
 Out-of-box GUI app
-==================
+******************
 
 When the |__PART_FAMILY_NAME__| EVM is powered on with SD card in place, the
 **Edge AI Gallery** comes up on boot as shown.
@@ -36,9 +37,9 @@ custom input (Camera/VideoFile/Image) and a custom model available in the
 filesystem. This will automatically construct a GStreamer pipeline with required
 elements and launch the application.
 
-- For a model to pop up on GUI, it needs to be present under ``/opt/model_zoo/``
-- For a videofile to pop up on GUI, the videos needs to be present under ``/opt/edgeai-test-data/videos/``
-- For an image to pop up on GUI, the images needs to be present under ``/opt/edgeai-test-data/iamges/``
+- For a model to pop up on GUI, it needs to be present under :file:`/opt/model_zoo/`
+- For a videofile to pop up on GUI, the videos needs to be present under :file:`/opt/edgeai-test-data/videos/`
+- For an image to pop up on GUI, the images needs to be present under :file:`/opt/edgeai-test-data/images/`
 
 
 .. note::
@@ -78,8 +79,9 @@ elements and launch the application.
 
 .. _pub_edgeai_python_cpp_demos:
 
+***************
 Python/C++ apps
-===============
+***************
 
 Python based demos are simple executable scripts written for image
 classification, object detection and semantic segmentation. Demos are
@@ -87,8 +89,8 @@ configured using a YAML file. Details on configuration file parameters can
 be found in :ref:`pub_edgeai_configuration`
 
 Sample configuration files for out of the box demos can be found in
-``edgeai-gst-apps/configs`` this folder also contains a template config file
-which has brief info on each configurable parameter ``edgeai-gst-apps/configs/app_config_template.yaml``
+:file:`edgeai-gst-apps/configs` this folder also contains a template config file
+which has brief info on each configurable parameter :file:`edgeai-gst-apps/configs/app_config_template.yaml`
 
 Here is how a Python based image classification demo can be run,
 
@@ -134,8 +136,9 @@ C++ apps can be modified and built on the target as well using below steps
 
 .. _pub_edgeai_optiflow_apps:
 
+********
 OpTIFlow
-========
+********
 
 In Edge AI Python and C++ applications, post processing and DL inference are done between
 appsink and appsrc application boundaries. This makes the data flow sub-optimal because of
@@ -167,8 +170,9 @@ To just dump the end-to-end pipeline use the following command.
    Python, C++ and OpTIFlow applications are similar by construction and can accept
    the same config file
 
+*****************
 EdgeAI Tiovx Apps
-=================
+*****************
 
 EdgeAI Tiovx Apps creates and runs optimized end-to-end OpenVx analytics pipelines
 based on the user defined configuration.
