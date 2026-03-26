@@ -524,6 +524,500 @@ Video Streaming use-case:
 
       target # gst-launch-1.0 filesrc location=sample_1072.yuv blocksize=3087360 ! rawvideoparse width=1920 height=1072 framerate=30/1 format=nv12 colorimetry=bt709 ! v4l2h264enc ! h264parse ! fakesink
 
+***********************
+Encoder Quality Control
+***********************
+
+The Wave5 encoder exposes a set of V4L2 controls that govern output quality and
+bitrate behaviour. They can be inspected on the target with:
+
+.. code-block:: console
+
+   target # v4l2-ctl -d 1 -l
+
+In GStreamer pipelines the controls are set through the ``extra-controls``
+property of the encoder element using the control names shown by ``v4l2-ctl``.
+
+Rate Control
+============
+
+Frame-level rate control is disabled by default. When disabled, the encoder
+operates in fixed-QP mode (see `Fixed QP`_). Enable ``frame_level_rate_control_enable``
+together with a target bitrate to let the encoder regulate quality automatically.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``frame_level_rate_control_enable``
+     - 0–1
+     - 0
+     - Enable frame-level rate control
+   * - ``video_bitrate_mode``
+     - 0 (VBR) / 1 (CBR)
+     - 1 (CBR)
+     - Constant or variable bitrate mode
+   * - ``video_bitrate``
+     - 0–700000000
+     - 0
+     - Target bitrate in bits per second
+   * - ``h264_mb_level_rate_control``
+     - 0–1
+     - 0
+     - Enable macroblock-level rate control and HVS-QP (H.264)
+   * - ``vbv_buffer_size``
+     - 10–3000
+     - 1000
+     - VBV buffer size in kilobits
+   * - ``h264_minimum_qp_value`` / ``hevc_minimum_qp_value``
+     - 0–63
+     - 8
+     - Lower QP bound the rate controller may use (highest quality)
+   * - ``h264_maximum_qp_value`` / ``hevc_maximum_qp_value``
+     - 0–63
+     - 51
+     - Upper QP bound the rate controller may use (lowest quality)
+
+The ``vbv_buffer_size`` control defines the size of the hypothetical decoder
+buffer (the Video Buffering Verifier model from the codec standard) that the
+encoder uses to bound how far the instantaneous bitrate may deviate from the
+target.
+
+In **VBR** mode, the driver ignores the configured value and forces
+``vbv_buffer_size`` to its maximum (3000), giving the encoder full freedom to
+redistribute bits across frames.
+
+In **CBR** mode, ``vbv_buffer_size`` determines the trade-off between bitrate
+stability and quality consistency:
+
+- **Large VBV buffer** — the encoder can borrow bits from future frames to
+  handle complex scenes, producing more consistent perceptual quality at the
+  cost of short-term bitrate variation.
+- **Small VBV buffer** — the encoder is forced to stay close to the target
+  bitrate on every frame. Quality may vary more across scene changes, but the
+  output bitrate is highly predictable. This is the preferred mode when the
+  downstream channel or storage budget is tightly constrained and bitrate
+  compliance matters more than quality consistency. A value of ``100`` is
+  the practical minimum for well-behaved CBR output.
+
+**CBR encode at 4 Mbps (H.264):**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate_mode=1,video_bitrate=4000000" ! \
+       filesink location=output.h264
+
+**Strict CBR at 4 Mbps with a small VBV buffer (H.264):**
+
+For resource-constrained pipelines where bitrate compliance is the priority:
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate_mode=1,video_bitrate=4000000,vbv_buffer_size=100" ! \
+       filesink location=output.h264
+
+**VBR encode at 4 Mbps (H.265):**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h265enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate_mode=0,video_bitrate=4000000" ! \
+       filesink location=output.h265
+
+**CBR with macroblock-level rate control (H.264):**
+
+Enabling ``h264_mb_level_rate_control`` in addition to frame-level rate control
+activates per-macroblock QP adjustment (HVS-QP), which allocates more bits to
+visually complex regions.
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,frame_level_rate_control_enable=1,h264_mb_level_rate_control=1,video_bitrate=4000000" ! \
+       filesink location=output.h264
+
+Fixed QP
+========
+
+When ``frame_level_rate_control_enable`` is 0 (the default), the encoder uses
+a fixed quantisation parameter for every frame. A lower QP produces higher
+quality at the cost of a larger bitstream; a higher QP reduces bitrate at the
+cost of quality. The valid range is 0–63.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``h264_i_frame_qp_value`` / ``hevc_i_frame_qp_value``
+     - 0–63
+     - 30
+     - QP applied to every frame
+   * - ``h264_chroma_qp_index_offset``
+     - -12–12
+     - 0
+     - Chroma QP offset relative to luma QP (H.264 only)
+
+**Fixed QP encode (H.264):**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,h264_i_frame_qp_value=28" ! \
+       filesink location=output.h264
+
+**Fixed QP encode (H.265):**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h265enc extra-controls="controls,hevc_i_frame_qp_value=28" ! \
+       filesink location=output.h265
+
+QP Range
+========
+
+With rate control enabled, ``h264_minimum_qp_value`` and
+``h264_maximum_qp_value`` (or their HEVC equivalents) bound the range of QP
+values the rate controller may select. The encoder varies QP freely within
+that range to meet the target bitrate, adapting quality frame-to-frame based
+on content complexity.
+
+Narrowing the range constrains how aggressively the encoder can trade quality
+for bitrate, producing more consistent visual quality at the cost of less
+precise bitrate adherence. Widening it gives the rate controller more freedom
+to hit the bitrate target efficiently.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``h264_minimum_qp_value`` / ``hevc_minimum_qp_value``
+     - 0–63
+     - 8
+     - Lower bound of the QP range (highest quality)
+   * - ``h264_maximum_qp_value`` / ``hevc_maximum_qp_value``
+     - 0–63
+     - 51
+     - Upper bound of the QP range (lowest quality)
+
+**Rate control with bounded QP range (H.264):**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate=4000000,h264_minimum_qp_value=20,h264_maximum_qp_value=40" ! \
+       filesink location=output.h264
+
+**Rate control with bounded QP range (H.265):**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h265enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate=4000000,hevc_minimum_qp_value=20,hevc_maximum_qp_value=40" ! \
+       filesink location=output.h265
+
+Profile and Level
+=================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``h264_profile``
+     - 0–7
+     - 0 (Baseline)
+     - H.264 profile: 0=Baseline, 1=Constrained Baseline, 2=Main, 4=High
+   * - ``h264_level``
+     - 0–15
+     - 0 (1.0)
+     - H.264 level
+   * - ``hevc_profile``
+     - 0–1
+     - 0 (Main)
+     - HEVC profile: 0=Main only (see note)
+   * - ``hevc_level``
+     - 0–8
+     - 0 (1.0)
+     - HEVC level
+
+Profile and level are negotiated through GStreamer caps rather than through
+``extra-controls``. The downstream caps filter constrains what the encoder
+must produce.
+
+**H.264 Baseline profile, Level 3.1** — widely compatible, suitable for
+720p30 and lower resolutions:
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc is-live=true num-buffers=300 ! \
+       video/x-raw,width=1280,height=720,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc ! 'video/x-h264,profile=(string)baseline,level=(string)3.1' ! \
+       filesink location=output.h264
+
+**H.264 Main profile, Level 4.1** — 1080p30, improved compression over
+Baseline:
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc is-live=true num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc ! 'video/x-h264,profile=(string)main,level=(string)4.1' ! \
+       filesink location=output.h264
+
+**H.264 High profile, Level 4.1** — 1080p30:
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc is-live=true num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc ! 'video/x-h264,profile=(string)high,level=(string)4.1' ! \
+       filesink location=output.h264
+
+**H.265 Main profile, Level 4.1** — 1080p30:
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc is-live=true num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h265enc ! 'video/x-h265,profile=(string)main,level=(string)4.1' ! \
+       filesink location=output.h265
+
+.. note::
+
+   Although the ``hevc_profile`` control exposes a ``Main10`` option (value 1),
+   10-bit encoding is **not supported** on |__PART_FAMILY_DEVICE_NAMES__|. The
+   option is present because the upstream driver is shared across Wave5 IP
+   variants, some of which include 10-bit capable hardware. The Wave5 variant
+   present on |__PART_FAMILY_DEVICE_NAMES__| is 8-bit only. Only ``Main``
+   (value 0) should be used.
+
+GOP and IDR Configuration
+==========================
+
+The intra-refresh period controls how frequently the encoder inserts I-frames
+(or IDR frames for H.265), which affects seeking, error resilience, and
+compression efficiency.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``h264_i_frame_period``
+     - 0–2047
+     - 0
+     - Intra-frame period in frames (H.264)
+   * - ``video_gop_size``
+     - 0–2047
+     - 0
+     - IDR period in frames (H.264)
+   * - ``hevc_num_of_i_frame_b_w_2_idr``
+     - 0–2047
+     - 0
+     - Intra-frame period in frames (H.265)
+   * - ``hevc_refresh_type``
+     - 0–2
+     - 2 (IDR)
+     - HEVC refresh type: 0=None, 1=CRA, 2=IDR
+
+**H.264 with a 2-second GOP at 30fps:**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate=4000000,h264_i_frame_period=60,video_gop_size=60" ! \
+       filesink location=output.h264
+
+**H.265 with periodic IDR refresh:**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h265enc extra-controls="controls,hevc_num_of_i_frame_b_w_2_idr=60,hevc_refresh_type=2" ! \
+       filesink location=output.h265
+
+Loop Filter
+===========
+
+The in-loop deblocking filter reduces blocking artefacts at block boundaries.
+It is enabled by default for both H.264 and H.265. The alpha/beta (H.264) and
+TC/beta (H.265) offset controls fine-tune the filter strength.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``h264_loop_filter_mode``
+     - 0–2
+     - 0 (Enabled)
+     - 0=Enabled, 1=Disabled, 2=Disabled at slice boundary
+   * - ``h264_loop_filter_alpha_offset``
+     - -6–6
+     - 0
+     - Alpha/TC offset — positive strengthens the filter
+   * - ``h264_loop_filter_beta_offset``
+     - -6–6
+     - 0
+     - Beta offset — positive strengthens the filter
+   * - ``hevc_loop_filter``
+     - 0–2
+     - 1 (Enabled)
+     - 0=Disabled, 1=Enabled, 2=Disabled at slice boundary
+   * - ``hevc_loop_filter_tc_offset``
+     - -6–6
+     - 0
+     - TC offset (H.265)
+   * - ``hevc_loop_filter_beta_offset``
+     - -6–6
+     - 0
+     - Beta offset (H.265)
+
+**H.264 with a stronger deblocking filter:**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,h264_loop_filter_mode=0,h264_loop_filter_alpha_offset=2,h264_loop_filter_beta_offset=2" ! \
+       filesink location=output.h264
+
+H.264 Specific Controls
+========================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``h264_entropy_mode``
+     - 0–1
+     - 0 (CAVLC)
+     - Entropy coding: 0=CAVLC, 1=CABAC
+   * - ``h264_8x8_transform_enable``
+     - 0–1
+     - 0
+     - Enable 8×8 transform (requires Main or High profile)
+
+CABAC entropy coding and 8×8 transforms improve compression efficiency compared
+to the Baseline profile defaults, but require at least the Main (2) or High (4)
+profile. Both features together represent a typical high-quality H.264 encoding
+configuration.
+
+**H.264 High profile with CABAC and 8×8 transforms:**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,h264_profile=4,h264_entropy_mode=1,h264_8x8_transform_enable=1,frame_level_rate_control_enable=1,video_bitrate=6000000" ! \
+       filesink location=output.h264
+
+H.265 Specific Controls
+========================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``hevc_lossless_encoding``
+     - 0–1
+     - 0
+     - Enable lossless encoding (bypasses quantisation)
+   * - ``hevc_strong_intra_smoothing``
+     - 0–1
+     - 1
+     - Strong intra smoothing for large intra blocks
+   * - ``hevc_tmv_prediction``
+     - 0–1
+     - 1
+     - Temporal motion vector prediction
+   * - ``hevc_max_num_of_candidate_mvs``
+     - 1–2
+     - 2
+     - Maximum number of merge motion-vector candidates
+
+**H.265 lossless encode:**
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h265enc extra-controls="controls,hevc_lossless_encoding=1" ! \
+       filesink location=output.h265
+
+Stream Structure
+================
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 15 15 30
+
+   * - Control
+     - Range
+     - Default
+     - Description
+   * - ``prepend_sps_and_pps_to_idr``
+     - 0–1
+     - 0
+     - Prepend SPS and PPS NAL units to every IDR frame
+   * - ``generate_access_unit_delimiters``
+     - 0–1
+     - 1
+     - Prepend an Access Unit Delimiter NAL unit to each frame
+
+Prepending SPS/PPS to every IDR frame is useful for streaming scenarios where a
+new receiver may join mid-stream and needs the codec parameters inline rather
+than only at the start of the file.
+
+.. code-block:: console
+
+   target # gst-launch-1.0 videotestsrc num-buffers=300 ! \
+       video/x-raw,width=1920,height=1080,framerate=30/1,format=NV12,colorimetry=bt709 ! \
+       v4l2h264enc extra-controls="controls,frame_level_rate_control_enable=1,video_bitrate=4000000,h264_i_frame_period=60,prepend_sps_and_pps_to_idr=1" ! \
+       filesink location=output.h264
+
 *****************************
 FFmpeg Plugins for Multimedia
 *****************************
